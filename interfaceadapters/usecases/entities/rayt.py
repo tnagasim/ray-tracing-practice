@@ -35,6 +35,14 @@ class Color:
         return color
     
     @staticmethod
+    def create_by_point(p: Vector3d)-> 'Color':
+        temp = p[:]
+        temp /= np.linalg.norm(temp)
+        temp = (temp + 1) / 2
+        color = Color(tuple(temp))
+        return color
+    
+    @staticmethod
     def create_red()-> 'Color':
         color = Color((1., 0., 0.))
         return color

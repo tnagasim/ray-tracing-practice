@@ -34,10 +34,11 @@ for j in range(ny):
         u = i / nx
         v = j / ny
         ray = camera.calc_ray_from_uv(u, v)
-        if sphere.hit(ray) is None:
+        p = sphere.hit(ray)
+        if p is None:
             color = Color.create_by_y(ray)
         else:
-            color = Color.create_red()
+            color = Color.create_by_point(p)
         image.putpixel((i, j), color.to_uint8())
 
 # %%
