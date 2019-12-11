@@ -6,12 +6,16 @@ from .rayt import Ray, Color
 Vector3d = np.array
 Vector3d_or_None = Union[Vector3d, None]
 
-class Sphere:
+class Object3d:
+    def hit(self, ray: Ray)-> Vector3d_or_None:
+        return None
+
+class Sphere(Object3d):
     def __init__(self, center: np.array, radius: float):
         self.center_ = center
         self.radius_ = radius
     
-    def hit(self, ray: Ray)-> Vector3d_or_None:
+    def calc_hit_point(self, ray: Ray)-> Vector3d_or_None:
         ray_o = ray.is_advanced(0.)
         ray_d = ray.is_advanced(1.) - ray_o
         o_to_c = self.center_ - ray_o

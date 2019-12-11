@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 from interfaceadapters import Viewer
 from interfaceadapters.usecases.entities import Camera, Color, FieldOfView
+from interfaceadapters.usecases.entities import Scene
 from interfaceadapters.usecases.entities import Sphere
 
 # %%
@@ -27,19 +28,11 @@ camera = Camera(o, FieldOfView(z, x, y))
 center = np.array([0., 0., 2])
 radius = 1.
 sphere = Sphere(center, radius)
+objs = (sphere, )
 
 # %%
-for j in range(ny):
-    for i in range(nx):
-        u = i / nx
-        v = j / ny
-        ray = camera.calc_ray_from_uv(u, v)
-        p = sphere.hit(ray)
-        if p is None:
-            color = Color.create_by_y(ray)
-        else:
-            color = Color.create_by_point(p)
-        image.putpixel((i, j), color.to_uint8())
+scene = Scene(camera, image, objs)
+scene.render()
 
 # %%
 Viewer.show(image)
