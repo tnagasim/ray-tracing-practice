@@ -16,13 +16,13 @@ class Scene:
         self.image = image
         self.objs = objs
     
-    def calc_min_hit_point(self, ray: Ray)-> Vector3d_or_None:
-        min_hit_point = None
+    def calc_hit_point(self, ray: Ray)-> Vector3d_or_None:
+        nearest_point = None
         for obj in self.objs:
             hit_point = obj.calc_hit_point(ray)
-            if (min_hit_point is None) or (np.dot(hit_point, ray) < np.dot(min_hit_point, ray)):
-                min_hit_point = hit_point
-        return min_hit_point
+            if (nearest_point is None) or (np.dot(hit_point, ray) < np.dot(nearest_point, ray)):
+                nearest_point = hit_point
+        return nearest_point
     
     def render(self):
         nx = self.image.width
@@ -32,9 +32,9 @@ class Scene:
                 u = (i + random.random()) / nx
                 v = (j + random.random()) / ny
                 ray = self.camera.calc_ray_from_uv(u, v)
-                min_hit_point = self.calc_min_hit_point(ray)
-                if min_hit_point is None:
+                hit_point = self.calc_hit_point(ray)
+                if hit_point is None:
                     color = Color.create_by_y(ray)
                 else:
-                    color = Color.create_by_point(min_hit_point)
+                    color = Color.create_by_point(hit_point)
                 self.image.putpixel((i, j), color.to_uint8())
