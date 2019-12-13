@@ -1,26 +1,24 @@
 import numpy as np
-from typing import Tuple
+from typing import NamedTuple, Tuple
 
 # type aliases
 Vector3d = np.array
 RGB_0_1 = Tuple[float, float, float]
 RGB_0_255 = Tuple[int, int, int]
 
-class Ray:
-    def __init__(self, origin: Vector3d, direction: Vector3d):
-        self.origin_ = origin
-        self.direction_ = direction / np.linalg.norm(direction)
+class Ray(NamedTuple):
+    origin: Vector3d
+    direction: Vector3d
     
     def is_advanced(self, t: float)-> Vector3d:
-        vec = self.origin_ + t * self.direction_
+        vec = self.origin + t * self.direction
         return vec
 
 
-class Color:
+class Color(NamedTuple):
+    rgb: RGB_0_1
+
     max_uint8 = 255
-    
-    def __init__(self, rgb: RGB_0_1):
-        self.rgb_ = rgb
     
     @staticmethod
     def create_by_y(ray: Ray)-> 'Color':
@@ -30,7 +28,7 @@ class Color:
         t = np.clip(dire[1]*2, 0., 1.)
         top = np.array([0.5, 0.7, 1.])
         bottom = np.array([1.]*3)
-        temp = t * top + (1-t) * bottom
+        temp = (1-t) * top + t * bottom
         color = Color(tuple(temp))
         return color
     
@@ -49,28 +47,26 @@ class Color:
     
     def to_uint8(self)-> RGB_0_255:
         ret = []
-        for c in self.rgb_:
+        for c in self.rgb:
             f = round(c*self.max_uint8)
             i = int(f)
             ret.append(i)
         return tuple(ret)
 
 
-class FieldOfView:
-    def __init__(self, center: Vector3d, width: Vector3d, height: Vector3d):
-        self.center_ = center[:]
-        self.width_ = width[:]
-        self.height_ = height[:]
+class FieldOfView(NamedTuple):
+    center: Vector3d
+    width: Vector3d
+    height: Vector3d
     
     def calc_point_at_uv(self, u: float, v: float)-> Vector3d:
-        p = self.center_ + self.width_ * (u-.5) + self.height_ * (v-.5)
+        p = self.center + self.width * (u-.5) + self.height * (v-.5)
         return p
 
 
-class Camera:
-    def __init__(self, origin: Vector3d, fov: FieldOfView):
-        self.origin_ = origin[:]
-        self.fov_ = fov
+class Camera(NamedTuple):
+    origin: Vector3d
+    fov: FieldOfView
     
     @staticmethod
     def create(
@@ -91,5 +87,7 @@ class Camera:
         return camera
     
     def calc_ray_from_uv(self, u: float, v: float)-> Ray:
-        ray = Ray(self.origin_, self.fov_.calc_point_at_uv(u, v))
+        dir = self.fov.calc_point_at_uv(u, v)
+        dir /= np.linalg.norm(dir)
+        ray = Ray(self.origin, dir)
         return ray
