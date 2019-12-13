@@ -17,11 +17,13 @@ class Scene:
         self.objs = objs
     
     def calc_hit_point(self, ray: Ray)-> Vector3d_or_None:
-        nearest_point = None
-        for obj in self.objs:
-            hit_point = obj.calc_hit_point(ray)
-            if (nearest_point is None) or (np.dot(hit_point, ray) < np.dot(nearest_point, ray)):
-                nearest_point = hit_point
+        hit_points = map(lambda obj: obj.calc_hit_point(ray), self.objs)
+        hit_points = list(filter(lambda point: point is not None, hit_points))
+        if hit_points == []:
+            return None
+        def func(point: Vector3d):
+            return np.dot(point, ray.direction)
+        nearest_point = min(hit_points, key=func)
         return nearest_point
     
     def render(self):
