@@ -10,7 +10,7 @@ from PIL import Image
 from interfaceadapters import Viewer
 from interfaceadapters.usecases.entities import Camera, Color, FieldOfView
 from interfaceadapters.usecases.entities import Scene
-from interfaceadapters.usecases.entities import Sphere
+from interfaceadapters.usecases.entities import Object3ds, Sphere
 
 # %%
 nx = 200
@@ -28,7 +28,7 @@ camera = Camera(o, FieldOfView(z, x, y))
 center = np.array([0., 0., 2])
 radius = 1.
 sphere = Sphere(center, radius)
-objs = (sphere, )
+objs = Object3ds((sphere, ))
 
 # %%
 scene = Scene(camera, image, objs)

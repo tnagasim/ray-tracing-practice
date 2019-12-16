@@ -1,5 +1,5 @@
 import numpy as np
-from typing import NamedTuple, Union
+from typing import NamedTuple, Tuple, Union
 from .rayt import Ray, Color
 
 # type aliases
@@ -7,8 +7,26 @@ Vector3d = np.array
 Vector3d_or_None = Union[Vector3d, None]
 
 class Object3d:
-    def hit(self, ray: Ray)-> Vector3d_or_None:
-        return None
+    pass
+
+
+# type aliases
+Objs = Tuple[Object3d, ...]
+
+class Object3ds:
+    def __init__(self, objs: Objs)-> None:
+        self.objs = objs
+    
+    def calc_hit_point(self, ray: Ray)-> Vector3d_or_None:
+        hit_points = map(lambda obj: obj.calc_hit_point(ray), self.objs)
+        hit_points = list(filter(lambda point: point is not None, hit_points))
+        if hit_points == []:
+            return None
+        def func(point: Vector3d):
+            return np.dot(point, ray.direction)
+        forward_point = min(hit_points, key=func)
+        return forward_point
+
 
 class Sphere(NamedTuple, Object3d):
     center: Vector3d
