@@ -1,6 +1,6 @@
 import numpy as np
 from typing import NamedTuple, Tuple, Union
-from .rayt import Ray, Color
+from . import Ray
 
 # type aliases
 Vector3d = np.array

@@ -2,15 +2,18 @@ import numpy as np
 from PIL import Image
 import random
 from typing import Tuple, Union
-from .object3d import Object3d, Object3ds
-from .rayt import Camera, Color, Ray
+from . import Object3ds
+from . import Camera, Color, Ray
 
 # type aliases
 Vector3d = np.array
 Vector3d_or_None = Union[Vector3d, None]
 
 class Scene:
-    def __init__(self, camera: Camera, image: Image, object3ds: Object3ds)-> None:
+    def __init__(self,
+            camera: Camera,
+            image: Image,
+            object3ds: Object3ds)-> None:
         self.camera = camera
         self.image = image
         self.object3ds = object3ds

@@ -8,7 +8,7 @@ if get_ipython():
 import numpy as np
 from PIL import Image
 from interfaceadapters import Viewer
-from interfaceadapters.usecases.entities import Camera, Color, FieldOfView
+from interfaceadapters.usecases.entities import Camera, FieldOfView
 from interfaceadapters.usecases.entities import Scene
 from interfaceadapters.usecases.entities import Object3ds, Sphere
 
