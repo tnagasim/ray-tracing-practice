@@ -5,6 +5,8 @@ if get_ipython():
     get_ipython().run_line_magic('autoreload', '2')
 
 # %%
+import sys
+sys.path.append('src')
 import numpy as np
 from PIL import Image
 from interfaceadapters import Viewer
