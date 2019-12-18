@@ -41,6 +41,7 @@ sphere2 = Sphere(center2, radius2)
 objs = Object3ds((sphere1, sphere2, ))
 
 # %%
+Scene.num_samples = 10
 scene = Scene(camera, image, objs)
 scene.render()
 
