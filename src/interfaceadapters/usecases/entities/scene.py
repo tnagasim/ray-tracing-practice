@@ -1,6 +1,5 @@
 import numpy as np
 from PIL import Image
-import random
 from typing import List, NamedTuple, Tuple, Union
 from . import Object3ds
 from . import Camera, PositionAndDirection
@@ -8,6 +7,7 @@ from . import Camera, PositionAndDirection
 # type aliases
 RGB_0_1 = Tuple[float, float, float]
 RGB_0_255 = Tuple[int, int, int]
+Vector2d = np.array
 Vector3d = np.array
 Vector3d_or_None = Union[Vector3d, None]
 
@@ -67,8 +67,8 @@ class Scene:
         self.image = image
         self.object3ds = object3ds
     
-    def calc_color_at_uv(self, u: float, v: float)-> Color:
-        ray = self.camera.calc_ray_from_uv(u, v)
+    def calc_color_at_uv(self, uv: Vector2d)-> Color:
+        ray = self.camera.calc_ray_from_uv(uv)
         hit = self.object3ds.calc_hit(ray)
         if hit is None:
             color = Color.create_by_y(ray)
@@ -79,13 +79,14 @@ class Scene:
     def render(self)-> None:
         nx = self.image.width
         ny = self.image.height
+        nxy = np.array([nx, ny])
         for j in range(ny):
             for i in range(nx):
                 colors = []
+                ij = np.array([i, j])
                 for _ in range(self.num_samples):
-                    u = (i + random.random()) / nx
-                    v = (j + random.random()) / ny
-                    color = self.calc_color_at_uv(u, v)
+                    uv = (ij + np.random.rand(2)) / nxy
+                    color = self.calc_color_at_uv(uv)
                     colors.append(color)
                 color = Color.calc_mean(colors)
                 self.image.putpixel((i, j), color.to_uint8())

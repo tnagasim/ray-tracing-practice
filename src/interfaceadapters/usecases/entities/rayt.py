@@ -2,6 +2,7 @@ import numpy as np
 from typing import NamedTuple, Tuple
 
 # type aliases
+Vector2d = np.array
 Vector3d = np.array
 
 class PositionAndDirection(NamedTuple):
@@ -24,8 +25,9 @@ class FieldOfView(NamedTuple):
     width: Vector3d
     height: Vector3d
     
-    def calc_point_at_uv(self, u: float, v: float)-> Vector3d:
-        p = self.center + self.width * (u-.5) + self.height * (v-.5)
+    def calc_point_at_uv(self, uv: Vector2d)-> Vector3d:
+        wh = np.array([self.width, self.height])
+        p = self.center + np.dot((uv-.5), wh)
         return p
 
 
@@ -49,8 +51,8 @@ class Camera(NamedTuple):
         camera = Camera(lookfrom, fov)
         return camera
     
-    def calc_ray_from_uv(self, u: float, v: float)-> PositionAndDirection:
-        dir = self.fov.calc_point_at_uv(u, v) - self.position
+    def calc_ray_from_uv(self, uv: Vector2d)-> PositionAndDirection:
+        dir = self.fov.calc_point_at_uv(uv) - self.position
         dir /= np.linalg.norm(dir)
         ray = PositionAndDirection(self.position, dir)
         return ray
