@@ -28,11 +28,12 @@ def test_calc_hit_point(sphere, origin, direction, expected):
     origin = np.array(origin)
     direction = np.array(direction)
     ray = PositionAndDirection(origin, direction)
-    point = sphere.calc_hit_point(ray)
+    hit = sphere.calc_hit(ray)
     if expected is None:
-        assert point is None
+        assert hit is None
     else:
-        for p, e in zip(point, expected):
+        hit_p = hit.get_position()
+        for p, e in zip(hit_p, expected):
             assert math.isclose(p, e)
 
 # %%
