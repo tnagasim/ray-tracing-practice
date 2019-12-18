@@ -87,7 +87,7 @@ class Camera(NamedTuple):
         return camera
     
     def calc_ray_from_uv(self, u: float, v: float)-> Ray:
-        dir = self.fov.calc_point_at_uv(u, v)
+        dir = self.fov.calc_point_at_uv(u, v) - self.origin
         dir /= np.linalg.norm(dir)
         ray = Ray(self.origin, dir)
         return ray

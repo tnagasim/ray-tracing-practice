@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from typing import NamedTuple, Tuple, Union
 from . import Ray
@@ -37,8 +38,12 @@ class Sphere(NamedTuple, Object3d):
         ray_d = ray.is_advanced(1.) - ray_o
         o_to_c = self.center - ray_o
         b = np.dot(ray_d, o_to_c)
+        if b < 0.:
+            return None
         c = np.dot(o_to_c, o_to_c) - self.radius * self.radius
         d = b * b - c
+        if math.isclose(d, 0., abs_tol=1.e-9):
+            d = 0.
         if d < 0.:
             return None
         t = b - np.sqrt(d)

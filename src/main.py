@@ -22,22 +22,22 @@ image = Image.new('RGB', (nx, ny))
 # %%
 x = np.array([4., 0., 0.])
 y = np.array([0., 2., 0.])
-z = np.array([0., 0., .5])
-o = np.array([0., 1., 0.])
+z = np.array([0., 0., 0.])
+o = np.array([0., 0., -1.])
 camera = Camera(o, FieldOfView(z, x, y))
 
 # %%
-center1 = np.array([0., 0., 1])
+center1 = np.array([0., 0., 0.])
 radius1 = .5
 sphere1 = Sphere(center1, radius1)
 
 # %%
-center2 = np.array([0., 1.5, 1])
-radius2 = 1.
+center2 = np.array([0., 10.5, 1])
+radius2 = 10.
 sphere2 = Sphere(center2, radius2)
 
 # %%
-objs = Object3ds((sphere2, ))
+objs = Object3ds((sphere1, sphere2, ))
 
 # %%
 scene = Scene(camera, image, objs)
