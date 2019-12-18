@@ -4,12 +4,18 @@ from typing import NamedTuple, Tuple
 # type aliases
 Vector3d = np.array
 
-class Ray(NamedTuple):
-    origin: Vector3d
+class PositionAndDirection(NamedTuple):
+    position: Vector3d
     direction: Vector3d
     
+    def get_direction(self)-> Vector3d:
+        return self.direction
+    
+    def get_position(self)-> Vector3d:
+        return self.position
+    
     def is_advanced(self, t: float)-> Vector3d:
-        vec = self.origin + t * self.direction
+        vec = self.position + t * self.direction
         return vec
 
 
@@ -24,7 +30,7 @@ class FieldOfView(NamedTuple):
 
 
 class Camera(NamedTuple):
-    origin: Vector3d
+    position: Vector3d
     fov: FieldOfView
     
     @staticmethod
@@ -43,8 +49,8 @@ class Camera(NamedTuple):
         camera = Camera(lookfrom, fov)
         return camera
     
-    def calc_ray_from_uv(self, u: float, v: float)-> Ray:
-        dir = self.fov.calc_point_at_uv(u, v) - self.origin
+    def calc_ray_from_uv(self, u: float, v: float)-> PositionAndDirection:
+        dir = self.fov.calc_point_at_uv(u, v) - self.position
         dir /= np.linalg.norm(dir)
-        ray = Ray(self.origin, dir)
+        ray = PositionAndDirection(self.position, dir)
         return ray

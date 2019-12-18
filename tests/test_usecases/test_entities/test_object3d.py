@@ -4,7 +4,7 @@ sys.path.append('src/')
 import math
 import numpy as np
 import pytest
-from interfaceadapters.usecases.entities import Ray
+from interfaceadapters.usecases.entities import PositionAndDirection
 from interfaceadapters.usecases.entities import Sphere
 
 @pytest.fixture()
@@ -27,7 +27,7 @@ def sphere():
 def test_calc_hit_point(sphere, origin, direction, expected):
     origin = np.array(origin)
     direction = np.array(direction)
-    ray = Ray(origin, direction)
+    ray = PositionAndDirection(origin, direction)
     point = sphere.calc_hit_point(ray)
     if expected is None:
         assert point is None

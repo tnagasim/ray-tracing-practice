@@ -20,9 +20,9 @@ ny = 100
 image = Image.new('RGB', (nx, ny))
 
 # %%
-lookfrom = np.array([0., 0., -1.])
+lookfrom = np.array([0., 0., 2.])
 lookat = np.array([0., 0., 0.])
-vup = np.array([0., -1., 0.])
+vup = np.array([0., 1., 0.])
 width = 4.
 height = 2.
 camera = Camera.create(lookfrom, lookat, vup, width, height)
@@ -33,8 +33,8 @@ radius1 = .5
 sphere1 = Sphere(center1, radius1)
 
 # %%
-center2 = np.array([0., 10.5, 1])
-radius2 = 10.
+center2 = np.array([0., -100.5, 0.])
+radius2 = 100.
 sphere2 = Sphere(center2, radius2)
 
 # %%

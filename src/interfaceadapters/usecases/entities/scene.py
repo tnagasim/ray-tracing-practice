@@ -3,7 +3,7 @@ from PIL import Image
 import random
 from typing import List, NamedTuple, Tuple, Union
 from . import Object3ds
-from . import Camera, Ray
+from . import Camera, PositionAndDirection
 
 # type aliases
 RGB_0_1 = Tuple[float, float, float]
@@ -25,7 +25,7 @@ class Color(NamedTuple):
         return color
 
     @staticmethod
-    def create_by_y(ray: Ray)-> 'Color':
+    def create_by_y(ray: PositionAndDirection)-> 'Color':
         dest = ray.is_advanced(1.)
         orig = ray.is_advanced(0.)
         dire = dest - orig
@@ -37,10 +37,8 @@ class Color(NamedTuple):
         return color
     
     @staticmethod
-    def create_by_point(p: Vector3d)-> 'Color':
-        temp = p[:]
-        temp /= np.linalg.norm(temp)
-        temp = (temp + 1) / 2
+    def create_by_normal_vector(n: Vector3d)-> 'Color':
+        temp = (n + 1) / 2
         color = Color(tuple(temp))
         return color
     
@@ -71,11 +69,11 @@ class Scene:
     
     def calc_color_at_uv(self, u: float, v: float)-> Color:
         ray = self.camera.calc_ray_from_uv(u, v)
-        hit_point = self.object3ds.calc_hit_point(ray)
-        if hit_point is None:
+        hit = self.object3ds.calc_hit(ray)
+        if hit is None:
             color = Color.create_by_y(ray)
         else:
-            color = Color.create_by_point(hit_point)
+            color = Color.create_by_normal_vector(hit.get_direction())
         return color
     
     def render(self)-> None:
