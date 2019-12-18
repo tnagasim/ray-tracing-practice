@@ -73,15 +73,13 @@ class Camera(NamedTuple):
             lookfrom: Vector3d,
             lookat: Vector3d,
             vup: Vector3d,
-            vfov: float,
-            aspect: float)-> 'Camera':
+            width: int,
+            height: int)-> 'Camera':
         unit_w = lookat - lookfrom
         unit_w /= np.linalg.norm(unit_w)
-        unit_u = np.cross(vup, unit_w)
+        unit_u = np.cross(unit_w, vup)
         unit_u /= np.linalg.norm(unit_u)
         unit_v = np.cross(unit_w, unit_u)
-        height = np.tan(np.deg2rad(vfov)/2) * 2
-        width = aspect * height
         fov = FieldOfView(lookat, width * unit_u, height * unit_v)
         camera = Camera(lookfrom, fov)
         return camera

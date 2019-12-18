@@ -10,7 +10,7 @@ sys.path.append('src')
 import numpy as np
 from PIL import Image
 from interfaceadapters import Viewer
-from interfaceadapters.usecases.entities import Camera, FieldOfView
+from interfaceadapters.usecases.entities import Camera
 from interfaceadapters.usecases.entities import Scene
 from interfaceadapters.usecases.entities import Object3ds, Sphere
 
@@ -20,11 +20,12 @@ ny = 100
 image = Image.new('RGB', (nx, ny))
 
 # %%
-x = np.array([4., 0., 0.])
-y = np.array([0., 2., 0.])
-z = np.array([0., 0., 0.])
-o = np.array([0., 0., -1.])
-camera = Camera(o, FieldOfView(z, x, y))
+lookfrom = np.array([0., 0., -1.])
+lookat = np.array([0., 0., 0.])
+vup = np.array([0., -1., 0.])
+width = 4.
+height = 2.
+camera = Camera.create(lookfrom, lookat, vup, width, height)
 
 # %%
 center1 = np.array([0., 0., 0.])
