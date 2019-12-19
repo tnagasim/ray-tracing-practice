@@ -34,6 +34,8 @@ class Sphere(NamedTuple, Object3d):
     center: Vector3d
     radius: float
     
+    min_t = 0.001
+    
     def calc_hit(self, ray: PositionAndDirection)-> PositionAndDirection_or_None:
         ray_p = ray.get_position()
         ray_d = ray.get_direction()
@@ -48,6 +50,10 @@ class Sphere(NamedTuple, Object3d):
         if d < 0.:
             return None
         t = b - np.sqrt(d)
+        if t < self.min_t:
+            t = b + np.sqrt(d)
+        if t < self.min_t:
+            return None
         p = ray.is_advanced(t)
         d = p - self.center
         d /= np.linalg.norm(d)
