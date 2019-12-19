@@ -11,11 +11,21 @@ Vector2d = np.array
 Vector3d = np.array
 Vector3d_or_None = Union[Vector3d, None]
 
+def random_in_unit_sphere():
+    vec = np.random.rand(3) * 2 - np.ones(3)
+    while np.linalg.norm(vec) > 1.:
+        vec = np.random.rand(3) * 2 - np.ones(3)
+    return vec
+
 
 class Color(NamedTuple):
     rgb: RGB_0_1
 
     max_uint8 = 255
+    
+    def __mul__(self, v: float)-> 'Color':
+        rgb = np.array(self.rgb) * v
+        return Color(rgb)
     
     @staticmethod
     def calc_mean(colors: List['Color'])-> 'Color':
@@ -69,11 +79,18 @@ class Scene:
     
     def calc_color_at_uv(self, uv: Vector2d)-> Color:
         ray = self.camera.calc_ray_from_uv(uv)
+        return self.calc_color_by_ray(ray)
+    
+    def calc_color_by_ray(self, ray: PositionAndDirection)->Color:
         hit = self.object3ds.calc_hit(ray)
         if hit is None:
             color = Color.create_by_y(ray)
         else:
-            color = Color.create_by_normal_vector(hit.get_direction())
+            position = hit.get_position()
+            direction = hit.get_direction() + random_in_unit_sphere()
+            direction /= np.linalg.norm(direction)
+            ray = PositionAndDirection(position, direction)
+            color = self.calc_color_by_ray(ray) * 0.5
         return color
     
     def render(self)-> None:
