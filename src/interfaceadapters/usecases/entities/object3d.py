@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from typing import NamedTuple, Tuple, Union
+from typing import List, NamedTuple, Tuple, Union
 from . import PositionAndDirection
 
 # type aliases
@@ -20,12 +20,14 @@ class Object3ds:
     
     def calc_hit(self, ray: PositionAndDirection)-> PositionAndDirection_or_None:
         hits = map(lambda obj: obj.calc_hit(ray), self.objs)
-        hits = list(filter(lambda hit: hit is not None, hits))
+        hits = list(filter(lambda hit: hit.get_position().size > 0 , hits))
         if hits == []:
             return None
-        ray_d = ray.get_direction()
+        ray_p = ray.get_position()
         def func(hit: PositionAndDirection):
-            return np.dot(hit.get_position(), ray_d)
+            d = np.linalg.norm(hit.get_position() - ray_p, axis=1)
+            ave = sum(d) / len(d)
+            return ave
         hit = min(hits, key=func)
         return hit
 
@@ -39,17 +41,21 @@ class Sphere(NamedTuple, Object3d):
         ray_d = ray.get_direction()
         o_to_c = self.center - ray_p
         b = np.dot(ray_d, o_to_c)
-        if b < 0.:
-            return None
+        b_is_non_negative = b >= 0.
         c = np.dot(o_to_c, o_to_c) - self.radius * self.radius
         d = b * b - c
-        if math.isclose(d, 0., abs_tol=1.e-9):
-            d = 0.
-        if d < 0.:
-            return None
+        d_is_zero = np.isclose(d, 0., rtol=1.e-9)
+        d[d_is_zero] = 0.
+        d_is_negative = d < 0.
+        d_is_non_negative = d >= 0.
+        d[d_is_negative] = 0.
         t = b - np.sqrt(d)
-        p = ray.is_advanced(t)
-        d = p - self.center
-        d /= np.linalg.norm(d)
-        hit = PositionAndDirection(p, d)
+        position = ray.is_advanced(t)
+        position = position[b_is_non_negative + d_is_non_negative]
+        direction = position - self.center
+        norm = np.linalg.norm(direction, axis=1)
+        reciprocal = np.reciprocal(norm)
+        reciprocal = reciprocal.reshape((reciprocal.size, 1))
+        direction *= reciprocal
+        hit = PositionAndDirection(position, direction)
         return hit

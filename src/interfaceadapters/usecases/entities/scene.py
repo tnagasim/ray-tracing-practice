@@ -7,7 +7,8 @@ from . import Camera, PositionAndDirection
 # type aliases
 RGB_0_1 = Tuple[float, float, float]
 RGB_0_255 = Tuple[int, int, int]
-Vector2d = np.array
+MatrixX2d = np.array
+MatrixX3d = np.array
 Vector3d = np.array
 Vector3d_or_None = Union[Vector3d, None]
 
@@ -26,9 +27,7 @@ class Color(NamedTuple):
 
     @staticmethod
     def create_by_y(ray: PositionAndDirection)-> 'Color':
-        dest = ray.is_advanced(1.)
-        orig = ray.is_advanced(0.)
-        dire = dest - orig
+        dire = ray.get_direction()
         t = np.clip(dire[1]*2, 0., 1.)
         top = np.array([0.5, 0.7, 1.])
         bottom = np.array([1.]*3)
@@ -37,10 +36,10 @@ class Color(NamedTuple):
         return color
     
     @staticmethod
-    def create_by_normal_vector(n: Vector3d)-> 'Color':
+    def create_by_normal_vector(n: MatrixX3d)-> List['Color']:
         temp = (n + 1) / 2
-        color = Color(tuple(temp))
-        return color
+        colors = [Color(tuple(color)) for color in temp]
+        return colors
     
     @staticmethod
     def create_red()-> 'Color':
@@ -67,13 +66,14 @@ class Scene:
         self.image = image
         self.object3ds = object3ds
     
-    def calc_color_at_uv(self, uv: Vector2d)-> Color:
+    def calc_color_at_uv(self, uv: MatrixX2d)-> Color:
         ray = self.camera.calc_ray_from_uv(uv)
         hit = self.object3ds.calc_hit(ray)
-        if hit is None:
-            color = Color.create_by_y(ray)
-        else:
-            color = Color.create_by_normal_vector(hit.get_direction())
+        color = Color.create_by_y(ray)
+        if hit is not None:
+            colors = Color.create_by_normal_vector(hit.get_direction())
+            colors += [color]*(self.num_samples-len(colors))
+            color = Color.calc_mean(colors)
         return color
     
     def render(self)-> None:
@@ -82,11 +82,7 @@ class Scene:
         nxy = np.array([nx, ny])
         for j in range(ny):
             for i in range(nx):
-                colors = []
                 ij = np.array([i, j])
-                for _ in range(self.num_samples):
-                    uv = (ij + np.random.rand(2)) / nxy
-                    color = self.calc_color_at_uv(uv)
-                    colors.append(color)
-                color = Color.calc_mean(colors)
+                uv = (ij + np.random.rand(self.num_samples, 2)) / nxy
+                color = self.calc_color_at_uv(uv)
                 self.image.putpixel((i, j), color.to_uint8())

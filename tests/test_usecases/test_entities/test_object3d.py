@@ -33,8 +33,9 @@ def test_calc_hit_point(sphere, origin, direction, expected):
         assert hit is None
     else:
         hit_p = hit.get_position()
-        for p, e in zip(hit_p, expected):
-            assert math.isclose(p, e)
+        for p in hit_p:
+            for mu, e in zip(p, expected):
+                assert math.isclose(mu, e)
 
 # %%
 center = np.array([0., 0., 0.])
