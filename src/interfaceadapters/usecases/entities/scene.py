@@ -27,6 +27,11 @@ class Color(NamedTuple):
         rgb = np.array(self.rgb) * v
         return Color(rgb)
     
+    def __pow__(self, v: float)-> 'Color':
+        rgb = np.array(self.rgb)
+        rgb = np.power(rgb, v)
+        return Color(rgb)
+
     @staticmethod
     def calc_mean(colors: List['Color'])-> 'Color':
         total = sum(np.array(color.rgb) for color in colors)
@@ -66,6 +71,18 @@ class Color(NamedTuple):
         return tuple(ret)
 
 
+class ImageFilter:
+    pass
+
+
+class GammaFilter(ImageFilter, NamedTuple):
+    factor: Vector3d
+
+    def filter(self, color: Color)-> Color:
+        temp = color**self.factor
+        return temp
+
+
 class Scene:
     num_samples = 100
 
@@ -97,6 +114,7 @@ class Scene:
         nx = self.image.width
         ny = self.image.height
         nxy = np.array([nx, ny])
+        gamma_filter = GammaFilter(1/2.2)
         for j in range(ny):
             for i in range(nx):
                 colors = []
@@ -106,4 +124,5 @@ class Scene:
                     color = self.calc_color_at_uv(uv)
                     colors.append(color)
                 color = Color.calc_mean(colors)
+                color = gamma_filter.filter(color)
                 self.image.putpixel((i, j), color.to_uint8())
